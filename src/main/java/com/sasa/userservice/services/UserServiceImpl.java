@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
         this.tokenRepository = tokenRepository;
     }
     @Override
-    public User signup(String name, String email, String password) {
+    public User signUp(String name, String email, String password) {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
             //TODO: Throw an exception from here like UserAlreadyExist
@@ -83,8 +83,14 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public void logout(String token) {
-
+    public void logout(String tokenValue) {
+      Optional<Token> optionalToken= tokenRepository.findByValueAndDeleted(tokenValue, false);
+      if(optionalToken.isEmpty()) {
+          return; //Throw some exception
+      }
+       Token token = optionalToken.get();
+      token.setDeleted(true);
+      tokenRepository.save(token);
     }
 
     private Token createToken(User user) {
